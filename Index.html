@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic Morning Schedule</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      line-height: 1.6;
+    }
+    h1 { text-align: center; }
+    .time-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 8px;
+      font-size: 1em;
+    }
+    .schedule {
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Morning Schedule</h1>
+  <div class="time-input">
+    <label for="wakeTime">Wake-up time: </label>
+    <input type="time" id="wakeTime" value="07:00">
+    <button onclick="generateSchedule()">Update</button>
+  </div>
+
+  <div class="schedule" id="schedule"></div>
+
+  <script>
+    const baseSchedule = [
+      { offset: 0, text: "Wake up" },
+      { offset: 5, text: "Get ready for run" },
+      { offset: 10, text: "Begin your run" },
+      { offset: 30, text: "Come back home" },
+      { offset: 30, duration: 20, text: "Shower & brush teeth" },
+      { offset: 60, text: "Open laptop and start your market analysis" }
+    ];
+
+    function formatTime(date) {
+      return date.toTimeString().slice(0,5);
+    }
+
+    function generateSchedule() {
+      const wakeInput = document.getElementById("wakeTime").value;
+      const [wakeHour, wakeMin] = wakeInput.split(":").map(Number);
+      let start = new Date();
+      start.setHours(wakeHour, wakeMin, 0, 0);
+
+      let html = "";
+      baseSchedule.forEach(item => {
+        let time = new Date(start.getTime());
+        time.setMinutes(start.getMinutes() + item.offset);
+
+        if (item.duration) {
+          let end = new Date(time.getTime());
+          end.setMinutes(end.getMinutes() + item.duration);
+          html += `<p>${formatTime(time)} - ${formatTime(end)} → ${item.text}</p>`;
+        } else {
+          html += `<p>${formatTime(time)} → ${item.text}</p>`;
+        }
+      });
+
+      document.getElementById("schedule").innerHTML = html;
+    }
+
+    // Run once at load
+    generateSchedule();
+  </script>
+</body>
+</html>
